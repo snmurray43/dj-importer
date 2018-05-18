@@ -1,0 +1,24 @@
+{
+  "name": "ts-base",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Setfive/ts-base.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Setfive/ts-base/issues"
+  },
+  "homepage": "https://github.com/Setfive/ts-base#readme",
+  "dependencies": {
+    "@types/minimist": "^1.2.0",
+    "@types/node": "^10.1.1",
+    "minimist": "^1.2.0"
+  }
+}
