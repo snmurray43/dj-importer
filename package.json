@@ -19,6 +19,8 @@
   "dependencies": {
     "@types/minimist": "^1.2.0",
     "@types/node": "^10.1.1",
-    "minimist": "^1.2.0"
+    "@types/restify": "^5.0.8",
+    "minimist": "^1.2.0",
+    "restify": "^7.2.0"
   }
 }
