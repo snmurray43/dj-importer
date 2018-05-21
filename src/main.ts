@@ -12,6 +12,7 @@ interface IConfig {
     port: number;
     clientId : string;
     clientSecret : string;
+    youtubeKey : string;
 }
 
 class Main {
@@ -56,6 +57,10 @@ class Main {
         );
     }
 
+    private searchYoutube() : void {
+        // See YoutubePhp for how youtube works
+    }
+
     private sendHtml(html : string, response: Response, next: Next) : void {
         response.setHeader('Content-Type', 'text/html');
         response.setHeader('Content-Length', Buffer.byteLength(html));
@@ -83,14 +88,15 @@ class Main {
     }
 }
 
-if(!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_SECRET_KEY){
-    console.log("You must set SPOTIFY_CLIENT_ID and SPOTIFY_SECRET_KEY environment variables.");
+if(!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_SECRET_KEY || !process.env.YOUTUBE_KEY){
+    console.log("You must set SPOTIFY_CLIENT_ID, SPOTIFY_SECRET_KEY, and YOUTUBE_KEY environment variables.");
     process.exit(-1);
 }
 
 const parsedParams : IConfig = _.extend({port: 8080}, require('minimist')(process.argv.slice(2)));
 parsedParams.clientId = process.env.SPOTIFY_CLIENT_ID ? process.env.SPOTIFY_CLIENT_ID : "";
 parsedParams.clientSecret = process.env.SPOTIFY_SECRET_KEY ? process.env.SPOTIFY_SECRET_KEY : "";
+parsedParams.youtubeKey = process.env.YOUTUBE_KEY ? process.env.YOUTUBE_KEY : "";
 
 (new Main()).Main(parsedParams);
 
