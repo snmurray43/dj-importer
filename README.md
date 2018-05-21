@@ -1,3 +1,3 @@
-# ts-base
+# DJ Importer
 
-An empty starter project to use for TypeScript apps.
+Nothing to see here...

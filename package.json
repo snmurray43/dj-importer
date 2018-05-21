@@ -17,10 +17,13 @@
   },
   "homepage": "https://github.com/Setfive/ts-base#readme",
   "dependencies": {
+    "@types/lodash": "^4.14.109",
     "@types/minimist": "^1.2.0",
     "@types/node": "^10.1.1",
     "@types/restify": "^5.0.8",
+    "lodash": "^4.17.10",
     "minimist": "^1.2.0",
-    "restify": "^7.2.0"
+    "restify": "^7.2.0",
+    "spotify-web-api-node": "git+https://github.com/Setfive/spotify-web-api-node.git"
   }
 }
