@@ -31,9 +31,6 @@ spotify.clientCredentialsGrant()
         spotify.getPlaylistTracks("spotify", "37i9dQZF1DX4dyzvuaRJ0n")
             .then((data: any) => {
                 console.log("Total tracks: " + data.body.items.length);
-
-                console.log(data.body.items[0].track.artists);
-
             })
             .catch((err: any) => {
                 console.log(err);

@@ -65,27 +65,13 @@ class Main {
     }
     
     private tracks(request: Request, response: Response, next: Next) : void {
-        const query : string = <string> request.body.query;
-        this.doSpotifyTrackSearch(query)
-            .then(results => {
-                response.send(results);
-                next();
-            })
-            .catch(err => {
-                response.send(500, err);
-                next();
-            });
-    }
+        const data : ISpotifyTrack[] = [
+            {name: "Coming Home", artist: "Tiesto Mesto"},
+            {name: "99 Problems", artist: "Jay-z"},
+        ];
 
-    private doSpotifyTrackSearch(searchQuery : string) : Promise<ISpotifyTrack[]> {
-        return new Promise<ISpotifyTrack[]>((resolve, reject) => {
-            const data : ISpotifyTrack[] = [
-                {name: "Coming Home", artist: "Tiesto Mesto"},
-                {name: "99 Problems", artist: "Jay-z"},
-            ];
-
-            resolve(data);
-        });
+        response.send(data);
+        next();
     }
     
     private searchYoutube() : void {
