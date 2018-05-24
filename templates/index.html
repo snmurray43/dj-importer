@@ -8,7 +8,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
 
@@ -20,37 +20,105 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="page-title">
-                <h2>DJ Importer</h2>
+                <h1>DJ Importer</h1>
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-sm-6">
-            <form method="get" action="/search" id="searchForm">
+            <h3>Search Playlists</h3>
+            <form id="searchForm">
                 <div class="form-group">
                     <input id="search" type="text" class="form-control" placeholder="Enter a search term..." />
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Search</button>
+                    <input type="submit" class="btn btn-primary" value="Search Playlists" />
                 </div>
             </form>
         </div>
+        <div class="col-sm-6">
+            <ul class="playlistResults" id="playlistResults">
+
+            </ul>
+        </div>
     </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <h3>Get Playlist Tracks</h3>
+            <form id="playListForm">
+                <div class="form-group">
+                    <input id="playlistId" type="text" class="form-control" placeholder="Enter username:playlistId" />
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary" value="Get Tracks" />
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-6">
+            <ul class="playlistResults" id="trackResults">
+
+            </ul>
+        </div>
+    </div>
+
 </div>
 
 <script>
-$(document).ready(function(){
+    $(document).ready(function () {
 
-   $("#searchForm").submit(function(){
-       $.get("/search", JSON.stringify({query: $("#search").val()}))
-        .then(function(results){
-            console.log(results);
+        $("#searchForm").submit(function (event) {
+            const params = JSON.stringify({query: $("#search").val()});
+
+            $("#playlistResults li").remove();
+
+            $.ajax({
+                type: 'POST',
+                url: '/search',
+                contentType: "application/json",
+                dataType: 'json',
+                data: params,
+                success: function (results) {
+                    const lis = results.map(f => `<li style="padding-bottom: 5px;">${f.id} - ${f.name}</li>`);
+                    $("#playlistResults").html(lis.join("\n"));
+                },
+            });
+
+            return false;
         });
 
-       return false;
-   });
+        $("#playListForm").submit(function (event) {
 
-});
+            const params = {user: "spotify", id: ""};
+            const val = $("#playlistId").val();
+
+            if(val.indexOf(":") > -1){
+                const splitId = val.split(":");
+                params.user = splitId[0];
+                params.id = splitId[1];
+            }else{
+                params.id = val;
+            }
+
+            $("#trackResults li").remove();
+
+            $.ajax({
+                type: 'POST',
+                url: '/tracks',
+                contentType: "application/json",
+                dataType: 'json',
+                data: JSON.stringify(params),
+                success: function (results) {
+                    const lis = results.map(f => `<li style="padding-bottom: 5px;">${f.artist} - ${f.name}</li>`);
+                    $("#trackResults").html(lis.join("\n"));
+                },
+            });
+
+            return false;
+        });
+
+    });
 </script>
 
 </body>

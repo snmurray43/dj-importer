@@ -5,7 +5,6 @@ import {Server} from "restify";
 import {Response} from "restify";
 import {Next} from "restify";
 import {Request} from "restify";
-
 const SpotifyWebApi = require("spotify-web-api-node");
 
 interface IConfig {
@@ -13,6 +12,17 @@ interface IConfig {
     clientId : string;
     clientSecret : string;
     youtubeKey : string;
+}
+
+interface ISpotifyPlaylist {
+    id : string;
+    name : string;
+    username : string;
+}
+
+interface ISpotifyTrack {
+    name : string;
+    artist : string;
 }
 
 class Main {
@@ -30,33 +40,54 @@ class Main {
         this.sendHtml(html, response, next);
     }
 
-    private search(html : string, response: Response, next: Next) : void {
-
-        const spotify = new SpotifyWebApi({
-            clientId: this.config.clientId,
-            clientSecret: this.config.clientSecret
-        });
-
-        spotify.clientCredentialsGrant()
-            .then((data : any) => {
-
-                spotify.setAccessToken(data.body['access_token']);
-
-                spotify.searchPlaylists("country", {market: "us"})
-                    .then((data: any) => {
-                        const items = data.body.playlists.items;
-                        response.send(items);
-                        next();
-                    }, (err: any) => {
-                        console.log(err);
-                    });
-            },
-            function(err : any) {
-                console.log('Something went wrong when retrieving an access token', err);
-            }
-        );
+    private search(request: Request, response: Response, next: Next) : void {
+        const query : string = <string> request.body.query;
+        this.doSpotifySearch(query)
+            .then(results => {
+                response.send(results);
+                next();
+            })
+            .catch(err => {
+                response.send(500, err);
+                next();
+            });
     }
 
+    private doSpotifySearch(searchQuery : string) : Promise<ISpotifyPlaylist[]> {
+        return new Promise<ISpotifyPlaylist[]>((resolve, reject) => {
+            const data : ISpotifyPlaylist[] = [
+                {id: "-1", username: "a user", name: "test playlist"},
+                {id: "-2", username: "a user", name: "test playlist two"}
+            ];
+
+            resolve(data);
+        });
+    }
+    
+    private tracks(request: Request, response: Response, next: Next) : void {
+        const query : string = <string> request.body.query;
+        this.doSpotifyTrackSearch(query)
+            .then(results => {
+                response.send(results);
+                next();
+            })
+            .catch(err => {
+                response.send(500, err);
+                next();
+            });
+    }
+
+    private doSpotifyTrackSearch(searchQuery : string) : Promise<ISpotifyTrack[]> {
+        return new Promise<ISpotifyTrack[]>((resolve, reject) => {
+            const data : ISpotifyTrack[] = [
+                {name: "Coming Home", artist: "Tiesto Mesto"},
+                {name: "99 Problems", artist: "Jay-z"},
+            ];
+
+            resolve(data);
+        });
+    }
+    
     private searchYoutube() : void {
         // See YoutubePhp for how youtube works
     }
@@ -65,7 +96,7 @@ class Main {
         response.setHeader('Content-Type', 'text/html');
         response.setHeader('Content-Length', Buffer.byteLength(html));
         response.write(html);
-
+        response.end();
         next();
     }
 
@@ -76,11 +107,12 @@ class Main {
         });
 
         this.server.use(restify.plugins.acceptParser(this.server.acceptable));
-        this.server.use(restify.plugins.queryParser());
-        this.server.use(restify.plugins.bodyParser());
+        this.server.use(restify.plugins.queryParser({mapParams: true}));
+        this.server.use(restify.plugins.bodyParser({mapParams: true}));
 
         this.server.get('/', this.index.bind(this));
-        this.server.get('/search', this.search.bind(this));
+        this.server.post('/search', this.search.bind(this));
+        this.server.post('/tracks', this.tracks.bind(this));
 
         this.server.listen(this.config.port, () => {
             console.log('%s listening at %s', this.server.name, this.server.url);
@@ -99,5 +131,3 @@ parsedParams.clientSecret = process.env.SPOTIFY_SECRET_KEY ? process.env.SPOTIFY
 parsedParams.youtubeKey = process.env.YOUTUBE_KEY ? process.env.YOUTUBE_KEY : "";
 
 (new Main()).Main(parsedParams);
-
-
