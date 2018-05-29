@@ -80,7 +80,7 @@
                 dataType: 'json',
                 data: params,
                 success: function (results) {
-                    const lis = results.map(f => `<li style="padding-bottom: 5px;">${f.id} - ${f.name}</li>`);
+                    const lis = results.map(f => `<li style="padding-bottom: 5px;">${f.id} - ${f.name} - ${f.username}</li>`);
                     $("#playlistResults").html(lis.join("\n"));
                 },
             });
