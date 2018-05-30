@@ -14,7 +14,7 @@ interface IConfig {
     youtubeKey : string;
 }
 
-interface ISpotifyPlaylist {
+export interface ISpotifyPlaylist {
     id : string;
     name : string;
     username : string;
