@@ -12,6 +12,16 @@ export class DB {
     }
 
     /**
+     * Write a SELECT to find the playlist row with the database id = id and resolve it.
+     * (You'll need this to power the insertPlaylist function below)
+     */
+    public findPlaylist(id : number) : Promise<Playlist> {
+        return new Promise<Playlist>((resolve, reject) => {
+
+        });
+    }
+
+    /**
      * The insight here is that you're taking in a spotify playlist,
      * need to generate, run an SQL INSERT, and then resolve the data from the newly inserted row
      */
