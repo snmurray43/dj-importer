@@ -23,9 +23,15 @@ interface IConfig {
 }
 
 export interface ISpotifyPlaylist {
-    id : string;
+    //id : string;
+    id : number;
     name : string;
     username : string;
+    spotifyId : string;
+    //userId : string;
+    createdAt : Date;
+    updatedAt : Date;
+
 }
 
 interface ISpotifyTrack {
