@@ -65,3 +65,6 @@ dist/
 
 # intellij files
 .idea/
+
+config.json
+
