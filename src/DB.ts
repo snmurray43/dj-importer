@@ -3,6 +3,31 @@ import {Pool} from "mysql";
 import {ISpotifyPlaylist} from "./main";
 import {PoolConnection} from "mysql";
 
+interface BaseEntity {
+
+    _kind : string;
+
+    [key: string]: any;
+
+}
+
+const DBMapping = [
+
+    {
+        table: "playlist_testing",
+        _kind : "playlist",
+        numCols : 6, // number of columns that will be updated when inserting a playlist (
+        mapping: [ ["id", "id"], ["spotifyId", "spotify_id"], ["spotifyUsername" , "spotify_username"],["name", "name"],["createdAt","created_at"],["updatedAt","updated_at"] ]
+    },
+    {
+        table: "playlist_songs_testing",
+        _kind : "song",
+        numCols : 7, // number of columns that will be updated when inserting a playlist (
+        mapping: [ ["id", "id"], ["videoId", "video_id"],["videoTitle" , "video_title"],["thumbUrl","thumb_url"],["position","position"],["createdAt", "created_at"],["updatedAt","updated_at"] ]
+    }
+
+];
+
 export class DB {
 
     private pool : mysql.Pool;
@@ -10,6 +35,7 @@ export class DB {
     public constructor(config : IDBConfig){
         this.pool  = mysql.createPool(config);
     }
+
 
     /**
      * Write a SELECT to find the playlist row with the database id = id and resolve it.
@@ -21,7 +47,6 @@ export class DB {
                 const sql = "SELECT * FROM playlist_testing WHERE id = ?";
                 conn.query(sql, [id], function(err:any, results : any) {
                     if(err) throw err;
-                    //console.log("Find Name: " + results[0].name);
                     resolve(results[0]);
                 });
                 conn.release();
@@ -35,8 +60,48 @@ export class DB {
      */
     public insertPlaylist(playlist : Playlist) : Promise<Playlist> {
         let insertId : number;
+        const table = DBMapping[0];
+        const cols = table.mapping.map(f=>f[1]);
+        const cols2 = table.mapping[1][1];
+        console.log(cols2);
+        //const vals = playlist[table.mapping.map((f:any) => f[1][0])];
+        //console.log(vals);
+        console.log(table.mapping[0][0]);
+        //const vals = playlist[table.mapping[0][0]];
+       // const vals = playlist[table.mapping.map(f => f[0][0])];
+
+        let values : any[] = [];
+        for (let i=0; i<table.numCols; i++) {
+            values.push(playlist[table.mapping[i][0]])
+        }
+        if(cols.indexOf("id") != -1) {
+            values.splice(cols.indexOf("id"),1);
+            cols.splice(cols.indexOf("id"), 1);
+        }
+/*
+        console.log("Columns: " + cols);
+        console.log("VALUES ARRAY: " + `${values.join(", ")}`);
+       // console.log("vals: " + vals);
+        console.log("Columns: " + cols);
+        console.log(table.table);
+*/
+
+        this.getConnection().then(conn => {
+            const s = `insert into ${(table.table)} (${cols.join(", ")}) values ('${values.join("', '")}', NOW(), NOW())`;
+            //console.log(s);
+
+            //     conn.query(s, [playlist[table.mapping[0][0]], playlist[table.mapping[1][0]], playlist[table.mapping[2][0]], playlist[table.mapping[3][0]]], function (err: any, results) {
+            conn.query(s, function (err: any, results) {
+
+                if (err) throw err;
+                //console.log("Insert ID: " + results.insertId);
+               // insertId = results.insertId;
+            });
+            conn.release();
+        });
+       // const sql = `INSERT INTO $(table.table) ${cols.join(", ")} ${vals.join(", ")}`;
         return new Promise<Playlist>((resolve, reject) => {
-            this.getConnection().then(conn => {
+            /*this.getConnection().then(conn => {
                 const sql = "insert into playlist_testing (name, spotify_id, spotify_username, created_at, updated_at) values (?,?,?,NOW(),NOW())";
                 conn.query(sql, [playlist.name, playlist.spotifyId, playlist.spotifyUsername, playlist.updatedAt], function(err:any, results) {
                     if(err) throw err;
@@ -44,17 +109,16 @@ export class DB {
                     insertId = results.insertId;
                 });
                 conn.release();
-            })
-            .then( conn => {
+            })*/
+     /*       .then( conn => {
                 this.getConnection().then(conn => {
                     this.findPlaylist(insertId)
                         .then((result: any) => {
-                            //console.log("Result: " + result.spotify_id);
                             resolve(result);
                         });
                     conn.release();
                 })
-            });
+            });*/
         });
     }
 
@@ -122,7 +186,7 @@ export class DB {
         let insertId : number;
         return new Promise<Song>((resolve, reject) => {
             this.getConnection().then(conn => {
-                const sql = "insert into playlist_songs_testing (video_id, video_title, thumb_url, position, created_at, updated_at) values (?,?,?,?, NOW(),NOW())";
+                const sql = "insert into playlist_songs_testing (video_id, video_title, thumb_url, position, playlist_id, created_at, updated_at) values (?,?,?,?,40, NOW(),NOW())";
                 conn.query(sql, [song.videoId, song.videoTitle, song.thumbUrl, song.position], function(err:any, results) {
                     if(err) throw err;
                     console.log("Insert ID: " + results.insertId);
@@ -190,7 +254,7 @@ export class DB {
     }
 }
 
-export interface Playlist {
+export interface Playlist extends BaseEntity{
     id : number;
     spotifyId : string;
     spotifyUsername : string;
@@ -199,7 +263,7 @@ export interface Playlist {
     updatedAt : Date;
 }
 
-export interface Song {
+export interface Song extends BaseEntity{
     id : number;
     videoId : string;
     videoTitle: string;

@@ -24,13 +24,15 @@ const createdTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
 }*/
 
 const myPlaylist = {
-   id : 191,
+   id : 1001,
    name : "name test2.0",
    spotifyUsername : "username test2.0",
    spotifyId : "spotifyId test 4.0",
    userId : "userId test",
     createdAt : createdD,
-    updatedAt : updatedD
+    updatedAt : updatedD,
+    _kind : "playlist"
+
 };
 
 const myPlaylist2 = {
@@ -39,7 +41,8 @@ const myPlaylist2 = {
     spotifyUsername : "updated username2",
     name : "updated name2",
     createdAt : createdD,
-    updatedAt : updatedD
+    updatedAt : updatedD,
+    _kind : "playlist"
 };
 
 const mySong = {
@@ -49,7 +52,9 @@ const mySong = {
     thumbUrl: "test thumb url 2",
     position: 10,
     createdAt : createdD,
-    updatedAt : updatedD
+    updatedAt : updatedD,
+    _kind : "song"
+
 };
 
 
@@ -58,10 +63,10 @@ db
     //.deleteSong(mySong);
 
 //.updateSong(mySong);
-    //.insertPlaylist(myPlaylist);
+    .insertPlaylist(myPlaylist);
     //.deletePlaylist(myPlaylist2);
 
-   .updatePlaylist(myPlaylist2);
+   //.updatePlaylist(myPlaylist2);
 
   //  .findPlaylist(191);
 

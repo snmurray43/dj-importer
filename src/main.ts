@@ -135,7 +135,8 @@ class Main {
                                     spotifyUsername: f.username,
                                     spotifyId: f.id,
                                     createdAt: createdD,
-                                    updatedAt: updatedD
+                                    updatedAt: updatedD,
+                                    _kind : "playlist"
                                 };
                                 db.insertPlaylist(myPlaylist);
 
@@ -186,7 +187,8 @@ class Main {
                                         thumbUrl : item.thumb,
                                         position : i,
                                         createdAt: createdD,
-                                        updatedAt: updatedD
+                                        updatedAt: updatedD,
+                                        _kind : "song"
                                     };
                                     db.insertSong(song);
                                     i++;
