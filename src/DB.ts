@@ -33,25 +33,23 @@ export class DB {
      * The insight here is that you're taking in a spotify playlist,
      * need to generate, run an SQL INSERT, and then resolve the data from the newly inserted row
      */
-    public insertPlaylist(playlist : ISpotifyPlaylist) : Promise<Playlist> {
+    public insertPlaylist(playlist : Playlist) : Promise<Playlist> {
         let insertId : number;
         return new Promise<Playlist>((resolve, reject) => {
             this.getConnection().then(conn => {
-                const sql = "insert into playlist_testing (name, spotify_id, spotify_username, created_at, updated_at) values (?,?,?,?,?)";
-                conn.query(sql, [playlist.name, playlist.spotifyId, playlist.username, playlist.createdAt, playlist.updatedAt], function(err:any, results) {
+                const sql = "insert into playlist_testing (name, spotify_id, spotify_username, created_at, updated_at) values (?,?,?,NOW(),NOW())";
+                conn.query(sql, [playlist.name, playlist.spotifyId, playlist.spotifyUsername, playlist.updatedAt], function(err:any, results) {
                     if(err) throw err;
-                    console.log("Insert ID: " + results.insertId);
+                    //console.log("Insert ID: " + results.insertId);
                     insertId = results.insertId;
-
                 });
-
                 conn.release();
             })
             .then( conn => {
                 this.getConnection().then(conn => {
                     this.findPlaylist(insertId)
                         .then((result: any) => {
-                            console.log("Result: " + result.spotify_id);
+                            //console.log("Result: " + result.spotify_id);
                             resolve(result);
                         });
                     conn.release();
@@ -67,8 +65,8 @@ export class DB {
     public updatePlaylist(playlist : Playlist) : Promise<Playlist> {
         return new Promise<Playlist>((resolve, reject) => {
             this.getConnection().then(conn => {
-                const sql = "UPDATE playlist_testing set name = ?, spotify_id = ?, spotify_username = ?, created_at = ?, updated_at = ? WHERE id = ?"
-                conn.query(sql, [playlist.name, playlist.spotifyId, playlist.spotifyUsername, playlist.createdAt, playlist.updatedAt, playlist.id], function(err:any, results: any, fields : any) {
+                const sql = "UPDATE playlist_testing set name = ?, spotify_id = ?, spotify_username = ?, updated_at = NOW() WHERE id = ?"
+                conn.query(sql, [playlist.name, playlist.spotifyId, playlist.spotifyUsername, playlist.id], function(err:any, results: any, fields : any) {
                     if(err) throw err;
                 });
                 resolve(playlist);
@@ -85,6 +83,91 @@ export class DB {
             this.getConnection().then(conn => {
                 const sql = "DELETE FROM playlist_testing WHERE id = ?"
                 conn.query(sql, playlist.id, function(err:any) {
+                    if(err) throw err;
+                });
+                resolve(true);
+                conn.release();
+            });
+        });
+    }
+
+    /** ----------------------------------------------------------------------------------------------------------
+     * ----------------------------------------------------------------------------------------------------------
+     * ----------------------------------------------------------------------------------------------------------
+
+    */
+    /**
+     * Write a SELECT to find the song row with the database id = id and resolve it.
+     * (You'll need this to power the insertSong function below)
+     */
+    public findSong(id : number) : Promise<Song> {
+        return new Promise<Song>((resolve, reject) => {
+            this.getConnection().then(conn => {
+                const sql = "SELECT * FROM playlist_songs_testing WHERE id = ?";
+                conn.query(sql, [id], function(err:any, results : any) {
+                    if(err) throw err;
+                    //console.log("Find Title: " + results[0].video_title);
+                    resolve(results[0]);
+                });
+                conn.release();
+            });
+        });
+    }
+
+    /**
+     * The insight here is that you're taking in a song,
+     * need to generate, run an SQL INSERT, and then resolve the data from the newly inserted row
+     */
+    public insertSong(song : Song) : Promise<Song> {
+        let insertId : number;
+        return new Promise<Song>((resolve, reject) => {
+            this.getConnection().then(conn => {
+                const sql = "insert into playlist_songs_testing (video_id, video_title, thumb_url, position, created_at, updated_at) values (?,?,?,?, NOW(),NOW())";
+                conn.query(sql, [song.videoId, song.videoTitle, song.thumbUrl, song.position], function(err:any, results) {
+                    if(err) throw err;
+                    console.log("Insert ID: " + results.insertId);
+                    insertId = results.insertId;
+                });
+                conn.release();
+            })
+                .then( conn => {
+                    this.getConnection().then(conn => {
+                        this.findSong(insertId)
+                            .then((result: any) => {
+                                //console.log("Result: " + result.thumb_url);
+                                resolve(result);
+                            });
+                        conn.release();
+                    })
+                });
+        });
+    }
+
+    /**
+     * Now, you're given data that exists in the database,
+     * need to generate an UPDATE SQL query, and run it, and then just resolve the updated song.
+     */
+    public updateSong(song : Song) : Promise<Song> {
+        return new Promise<Song>((resolve, reject) => {
+            this.getConnection().then(conn => {
+                const sql = "UPDATE playlist_songs_testing set video_id = ?, video_title = ?, thumb_url = ?, position = ?, created_at = ?, updated_at = ? WHERE id = ?"
+                conn.query(sql, [song.videoId, song.videoTitle, song.thumbUrl, song.position, song.createdAt, song.updatedAt, song.id], function(err:any, results: any, fields : any) {
+                    if(err) throw err;
+                });
+                resolve(song);
+                conn.release();
+            });
+        });
+    }
+
+    /**
+     * Just generate and run the appropriate DELETE SQL statement and resolve when its done
+     */
+    public deleteSong(song: Song) : Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            this.getConnection().then(conn => {
+                const sql = "DELETE FROM playlist_songs_testing WHERE id = ?";
+                conn.query(sql, song.id, function(err:any) {
                     if(err) throw err;
                 });
                 resolve(true);
@@ -114,6 +197,16 @@ export interface Playlist {
     name : string;
     createdAt : Date;
     updatedAt : Date;
+}
+
+export interface Song {
+    id : number;
+    videoId : string;
+    videoTitle: string;
+    thumbUrl : string;
+    position: number;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface IDBConfig {

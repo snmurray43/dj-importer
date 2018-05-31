@@ -7,6 +7,12 @@ const createdD = new Date('2018-06-04 00:00:00');
 //var createdD = new Date().toISOString().slice(0, 19).replace('T', ' ');
 const updatedD = new Date('2018-07-05 00:00:00');
 
+const createdTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+//const createdT : string = <string> createdTime;
+//const createdT : Date = <Date> createdTime;
+
+//const created = new Date(createdT);
+//console.log(createdT);
 
 /*export interface Playlist {
     id : number;
@@ -20,28 +26,42 @@ const updatedD = new Date('2018-07-05 00:00:00');
 const myPlaylist = {
    id : 191,
    name : "name test2.0",
-   username : "username test2.0",
-   spotifyId : "spotifyId test 3.0",
+   spotifyUsername : "username test2.0",
+   spotifyId : "spotifyId test 4.0",
    userId : "userId test",
     createdAt : createdD,
     updatedAt : updatedD
-}
+};
 
 const myPlaylist2 = {
-    id: 191,
+    id: 483,
     spotifyId : "updated ID2",
     spotifyUsername : "updated username2",
     name : "updated name2",
     createdAt : createdD,
     updatedAt : updatedD
-}
+};
+
+const mySong = {
+    id: 166,
+    videoId : "test video ID 2",
+    videoTitle: "Test video title 2",
+    thumbUrl: "test thumb url 2",
+    position: 10,
+    createdAt : createdD,
+    updatedAt : updatedD
+};
 
 
 db
-    .insertPlaylist(myPlaylist);
- //   .deletePlaylist(myPlaylist2);
+    //.findSong(163);
+    //.deleteSong(mySong);
 
-//.updatePlaylist(myPlaylist2);
+//.updateSong(mySong);
+    //.insertPlaylist(myPlaylist);
+    //.deletePlaylist(myPlaylist2);
+
+   .updatePlaylist(myPlaylist2);
 
   //  .findPlaylist(191);
 

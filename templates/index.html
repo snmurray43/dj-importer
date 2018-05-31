@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" style = "max-width: 1300px">
     <div class="row">
         <div class="col-sm-12">
             <div class="page-title">
@@ -110,7 +110,7 @@
                 dataType: 'json',
                 data: JSON.stringify(params),
                 success: function (results) {
-                    const lis = results.map(f => `<li style="padding-bottom: 5px;">${f.artist} - ${f.name}</li>`);
+                    const lis = results.map(f => `<li style="padding-bottom: 10px;"><a href = "https://www.${f.url}" TARGET="_blank"><img src = ${f.thumb}></a> - ${f.artist} - ${f.name} - ${f.youtubeId}</li>`);
                     $("#trackResults").html(lis.join("\n"));
                 },
             });
